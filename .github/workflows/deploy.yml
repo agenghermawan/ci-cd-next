@@ -44,5 +44,4 @@ jobs:
         username: ${{ secrets.GCLOUD_VM_USER }}
         key: ${{ secrets.GCLOUD_SSH_KEY }}
         script: |
-          cd /home/agenghermawan32/app
-          pm2 restart my-next-app || pm2 start npm --name "my-next-app" -- start
+          sudo systemctl restart nginx
