@@ -1,32 +1,44 @@
-name: Deploy to Shared Hosting
+name: Deploy to GCP VM
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-      - name: Install Dependencies
-        run: npm install
+    - name: Install dependencies
+      run: npm install
 
-      - name: Build Static Site
-        run: npm run build
+    - name: Build Next.js app
+      run: npm run build
 
-      - name: Upload to Shared Hosting via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./out
+    - name: Copy files to VM
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.GCLOUD_VM_HOST }}
+        username: ${{ secrets.GCLOUD_VM_USER }}
+        key: ${{ secrets.GCLOUD_SSH_KEY }}
+        source: ".next public package.json node_modules"
+        target: "/home/agenghermawan32/app"
+
+    - name: Restart App via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.GCLOUD_VM_HOST }}
+        username: ${{ secrets.GCLOUD_VM_USER }}
+        key: ${{ secrets.GCLOUD_SSH_KEY }}
+        script: |
+          cd /home/agenghermawan32/app
+          pm2 restart my-next-app || pm2 start npm --name "my-next-app" -- start
