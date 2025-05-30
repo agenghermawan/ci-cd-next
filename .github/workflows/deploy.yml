@@ -33,8 +33,9 @@ jobs:
         host: ${{ secrets.GCLOUD_VM_HOST }}
         username: ${{ secrets.GCLOUD_VM_USER }}
         key: ${{ secrets.GCLOUD_SSH_KEY }}
-        source: "out public package.json package-lock.json next.config.js"
+        source: "out"
         target: "/home/agenghermawan32/app"
+
 
     - name: Restart App via SSH
       uses: appleboy/ssh-action@v1.0.3
