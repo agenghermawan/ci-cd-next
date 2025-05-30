@@ -30,7 +30,7 @@ jobs:
         host: ${{ secrets.GCLOUD_VM_HOST }}
         username: ${{ secrets.GCLOUD_VM_USER }}
         key: ${{ secrets.GCLOUD_SSH_KEY }}
-        source: ".next public package.json node_modules"
+        source: "out public package.json package-lock.json next.config.js"
         target: "/home/agenghermawan32/app"
 
     - name: Restart App via SSH
